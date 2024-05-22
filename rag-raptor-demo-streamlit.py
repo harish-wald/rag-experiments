@@ -12,7 +12,6 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 import streamlit as st
 
 
-os.environ["OPENAI_API_KEY"] = "sk-proj-cHgnNwpihYLM884UqVkDT3BlbkFJGw0AgW8etJSuz6s13Le1"
 
 import asyncio
 
