@@ -37,18 +37,18 @@ _vector_store = ChromaVectorStore(chroma_collection=collection)
 #     transformations=[SentenceSplitter(chunk_size=400, chunk_overlap=50)]
 # )
 
-retriever = RaptorRetriever(
-    [],
-    embed_model=OpenAIEmbedding(model="text-embedding-3-small"),
-    llm=OpenAI(model="gpt-3.5-turbo", temperature=0.1),
-    vector_store=_vector_store,
-    similarity_top_k=2,
-    mode="tree_traversal"
-)
+# retriever = RaptorRetriever(
+#     [],
+#     embed_model=OpenAIEmbedding(model="text-embedding-3-small"),
+#     llm=OpenAI(model="gpt-3.5-turbo", temperature=0.1),
+#     vector_store=_vector_store,
+#     similarity_top_k=2,
+#     mode="tree_traversal"
+# )
 
-raptor_query_engine = RetrieverQueryEngine.from_args(
-    retriever, llm=OpenAI(model="gpt-3.5-turbo", temperature=0.1, use_async=True)
-)
+# raptor_query_engine = RetrieverQueryEngine.from_args(
+#     retriever, llm=OpenAI(model="gpt-3.5-turbo", temperature=0.1, use_async=True)
+# )
 
 index = VectorStoreIndex.from_documents(_documents)
 query_engine = index.as_query_engine()
@@ -64,7 +64,7 @@ query_engine = index.as_query_engine()
 
 
 def query_raptor(input_prompt):
-    print(f'entering inside raptor query engine raptor_query_engine {raptor_query_engine}')
+    #print(f'entering inside raptor query engine raptor_query_engine {raptor_query_engine}')
     start_time = time.time()
     retriever = RaptorRetriever(
     [],
@@ -72,7 +72,7 @@ def query_raptor(input_prompt):
     llm=OpenAI(model="gpt-3.5-turbo", temperature=0.1),
     vector_store=_vector_store,
     similarity_top_k=2,
-    mode="tree_traversal"
+    mode="collapsed"
 )
 
     raptor_query_engine1 = RetrieverQueryEngine.from_args(
@@ -99,14 +99,14 @@ def hello_world():
     
     question = (request.json)['query']
     print(question)
-    response1 = query_vanilla(question)
-    response2 = query_raptor(question)
-    # with ThreadPoolExecutor() as executor:
-    #     future1 = executor.submit(query_raptor, question)
-    #     future2 = executor.submit(query_vanilla, question)
+    # response1 = query_vanilla(question)
+    # response2 = query_raptor(question)
+    with ThreadPoolExecutor() as executor:
+        future1 = executor.submit(query_vanilla, question)
+        future2 = executor.submit(query_raptor, question)
 
-    #     response1 = future1.result()
-    #     response2 = future2.result()
+        response1 = future1.result()
+        response2 = future2.result()
 
     combined_response = {
         'response1': response1,
@@ -118,4 +118,4 @@ def hello_world():
 
 
 if __name__ == '__main__':
-   app.run(debug = True,port = 8000)
+   app.run(debug = True,port = 8000 ,use_reloader=False)
